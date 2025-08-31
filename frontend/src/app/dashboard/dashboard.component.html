@@ -1,0 +1,67 @@
+<section class="dash">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="m-0">My Projects</h2>
+    <div>
+      <button class="btn btn-primary" (click)="showCreateModal.set(true)"><i class="fa fa-plus me-1"></i>Create Project</button>
+    </div>
+  </div>
+  <div class="row g-2 align-items-center mb-3">
+    <div class="col-auto">
+      <input class="form-control" style="min-width: 260px;" placeholder="Invite code" [(ngModel)]="inviteCode" />
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" (click)="joinProject()" [disabled]="isJoining()">
+        <span class="spinner-border spinner-border-sm me-2" *ngIf="isJoining()"></span>
+        Join
+      </button>
+    </div>
+  </div>
+  <div class="list-group">
+    <div class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let p of projects()">
+      <a class="text-decoration-none flex-grow-1" [routerLink]="['/projects', p.id]">
+        <strong>{{ p.name }}</strong>
+      </a>
+      <span class="badge text-bg-light me-2">Invite: {{ p.inviteCode }}</span>
+      <button class="btn btn-sm btn-link" title="Copy invite" (click)="copyInvite(p.inviteCode)"><i class="fa fa-copy"></i></button>
+      <button class="btn btn-sm btn-link text-danger" title="Delete project" (click)="deleteProject(p.id)" *ngIf="isOwnerProject(p)"><i class="fa fa-trash"></i></button>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div class="modal-backdrop" *ngIf="showCreateModal()" (click)="showCreateModal.set(false)"></div>
+  <div class="modal-sheet" *ngIf="showCreateModal()">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Create Project</strong>
+        <button type="button" class="btn-close" aria-label="Close" (click)="showCreateModal.set(false)"></button>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Name</label>
+            <input class="form-control" [(ngModel)]="newProjectName" />
+            <div class="text-danger small" *ngIf="submittedProjectCreate() && newProjectName.trim() === ''">Name is required.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <input class="form-control" [(ngModel)]="newProjectDescription" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Deadline</label>
+            <input class="form-control" type="date" [(ngModel)]="newProjectDeadline" />
+            <div class="text-danger small" *ngIf="submittedProjectCreate() && !newProjectDeadline">Deadline is required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-end">
+        <button class="btn btn-secondary me-2" (click)="showCreateModal.set(false)">Cancel</button>
+        <button class="btn btn-primary" (click)="createProject()" [disabled]="isCreating()">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="isCreating()"></span>
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+

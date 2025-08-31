@@ -1,0 +1,24 @@
+@ProjectTracker.Api_HostAddress = http://localhost:5011
+
+GET {{ProjectTracker.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### Auth
+POST {{ProjectTracker.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Password1!"
+}
+
+###
+POST {{ProjectTracker.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Password1!"
+}
+
+###

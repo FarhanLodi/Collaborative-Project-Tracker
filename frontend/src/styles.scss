@@ -1,0 +1,7 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+body { background-color: #fff; }
+
+.board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.column .list { background: #f7f7f7; border-radius: .5rem; padding: .75rem; min-height: 280px; }

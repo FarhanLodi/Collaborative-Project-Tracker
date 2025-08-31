@@ -1,0 +1,11 @@
+<nav class="navbar navbar-light bg-light px-3">
+  <a class="navbar-brand" href="/">Collaborative Project Tracker</a>
+  <div class="ms-auto" *ngIf="!isAuthPage() && auth.isAuthenticated()">
+    <button class="btn btn-outline-secondary btn-sm" (click)="logout()"><i class="fa fa-sign-out-alt me-1"></i>Logout</button>
+  </div>
+</nav>
+<div class="container py-3">
+  <router-outlet />
+  
+</div>
+<app-toasts></app-toasts>

@@ -1,0 +1,202 @@
+<section class="pd">
+  <div class="toolbar">
+    <div class="title">{{ project()?.name }}</div>
+    <div class="actions" *ngIf="isOwner()">
+      <button class="btn btn-primary" (click)="openCreate()"><i class="fa fa-plus me-1"></i>Add Task</button>
+    </div>
+  </div>
+  <div class="row g-2 align-items-center mb-4">
+    <div class="col-auto" *ngIf="isOwner()">
+      <label class="form-label me-2">Assignee</label>
+      <select class="form-select" style="min-width: 200px; display: inline-block;" [(ngModel)]="filterAssigneeId" (ngModelChange)="onFiltersChange()">
+        <option value="all">All</option>
+        <option value="unassigned">Unassigned</option>
+        <option *ngFor="let m of project()?.members" [value]="m.userId">{{ m.user?.fullName || m.user?.email }}</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <label class="form-label me-2">Status</label>
+      <select class="form-select" style="min-width: 160px; display: inline-block;" [(ngModel)]="filterStatus" (ngModelChange)="onFiltersChange()">
+        <option value="all">All</option>
+        <option value="ToDo">To Do</option>
+        <option value="InProgress">In Progress</option>
+        <option value="Done">Done</option>
+      </select>
+    </div>
+  </div>
+  <div class="board" cdkDropListGroup>
+    <div class="column">
+      <h3>To Do</h3>
+      <div class="list" cdkDropList [cdkDropListData]="todo()" (cdkDropListDropped)="drop($event, 'ToDo')">
+        <div class="card card-body mb-2 d-flex justify-content-between align-items-center" *ngFor="let t of todo(); let i = index" cdkDrag>
+          <div class="me-2" (click)="select(t)">
+            <div class="title">{{ t.title }}</div>
+            <div class="meta">{{ getAssigneeName(t) }}</div>
+          </div>
+          <span class="ms-auto">
+            <button class="btn btn-sm btn-link text-secondary me-1" title="Edit" (click)="openEdit(t); $event.stopPropagation()" *ngIf="isOwner()"><i class="fa fa-pen"></i></button>
+            <button class="btn btn-sm btn-link text-danger" title="Delete" (click)="openDelete(t); $event.stopPropagation()" *ngIf="isOwner()"><i class="fa fa-trash"></i></button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <h3>In Progress</h3>
+      <div class="list" cdkDropList [cdkDropListData]="inProgress()" (cdkDropListDropped)="drop($event, 'InProgress')">
+        <div class="card card-body mb-2 d-flex justify-content-between align-items-center" *ngFor="let t of inProgress(); let i = index" cdkDrag>
+          <div class="me-2" (click)="select(t)">
+            <div class="title">{{ t.title }}</div>
+            <div class="meta">{{ getAssigneeName(t) }}</div>
+          </div>
+          <span class="ms-auto">
+            <button class="btn btn-sm btn-link text-secondary me-1" title="Edit" (click)="openEdit(t); $event.stopPropagation()" *ngIf="isOwner()"><i class="fa fa-pen"></i></button>
+            <button class="btn btn-sm btn-link text-danger" title="Delete" (click)="openDelete(t); $event.stopPropagation()" *ngIf="isOwner()"><i class="fa fa-trash"></i></button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <h3>Done</h3>
+      <div class="list" cdkDropList [cdkDropListData]="done()" (cdkDropListDropped)="drop($event, 'Done')">
+        <div class="card card-body mb-2 d-flex justify-content-between align-items-center" *ngFor="let t of done(); let i = index" cdkDrag>
+          <div class="me-2" (click)="select(t)">
+            <div class="title">{{ t.title }}</div>
+            <div class="meta">{{ getAssigneeName(t) }}</div>
+          </div>
+          <span class="ms-auto">
+            <button class="btn btn-sm btn-link text-secondary me-1" title="Edit" (click)="openEdit(t); $event.stopPropagation()" *ngIf="isOwner()"><i class="fa fa-pen"></i></button>
+            <button class="btn btn-sm btn-link text-danger" title="Delete" (click)="openDelete(t); $event.stopPropagation()" *ngIf="isOwner()"><i class="fa fa-trash"></i></button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Modal -->
+  <div class="modal-backdrop" *ngIf="showEditModal()" (click)="closeModals()"></div>
+  <div class="modal-sheet" *ngIf="showEditModal()">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Edit Task</strong>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModals()"></button>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Title</label>
+            <input class="form-control" [(ngModel)]="editTitle" />
+            <div class="text-danger small" *ngIf="submittedEdit() && editTitle.trim() === ''">Title is required.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Assignee</label>
+            <select class="form-select" [(ngModel)]="editAssigneeId">
+              <option value="">Unassigned</option>
+              <option *ngFor="let m of project()?.members" [value]="m.userId">{{ m.user?.fullName || m.user?.email }}</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="editStatus">
+              <option value="ToDo">To Do</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+            <div class="text-danger small" *ngIf="submittedEdit() && !editStatus">Status is required.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editDescription"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-end">
+        <button class="btn btn-secondary me-2" (click)="closeModals()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveFromModal()" [disabled]="savingTask()">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="savingTask()"></span>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div class="modal-backdrop" *ngIf="showCreateModal()" (click)="showCreateModal.set(false)"></div>
+  <div class="modal-sheet" *ngIf="showCreateModal()">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Add Task</strong>
+        <button type="button" class="btn-close" aria-label="Close" (click)="showCreateModal.set(false)"></button>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Title</label>
+            <input class="form-control" [(ngModel)]="newTitle" />
+            <div class="text-danger small" *ngIf="submittedCreate() && newTitle.trim() === ''">Title is required.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Assignee</label>
+            <select class="form-select" [(ngModel)]="assigneeForNew">
+              <option value="">Unassigned</option>
+              <option *ngFor="let m of project()?.members" [value]="m.userId">{{ m.user?.fullName || m.user?.email }}</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="newStatus">
+              <option value="ToDo">To Do</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+            <div class="text-danger small" *ngIf="submittedCreate() && !newStatus">Status is required.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Due Date</label>
+            <input class="form-control" type="date" [(ngModel)]="newDueDate" />
+            <div class="text-danger small" *ngIf="submittedCreate() && !newDueDate">Due date is required.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="newDescription"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Attachments</label>
+            <input class="form-control" type="file" multiple (change)="onNewFiles($event)" />
+            <div class="form-text" *ngIf="newFiles?.length">{{ newFiles.length }} file(s) selected</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-end">
+        <button class="btn btn-secondary me-2" (click)="showCreateModal.set(false)">Cancel</button>
+        <button class="btn btn-primary" (click)="createTask()" [disabled]="creatingTask()">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="creatingTask() || uploadingAttachments()"></span>
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-backdrop" *ngIf="showDeleteModal()" (click)="closeModals()"></div>
+  <div class="modal-sheet" *ngIf="showDeleteModal()">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Delete Task</strong>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModals()"></button>
+      </div>
+      <div class="card-body">
+        Are you sure you want to delete "{{ selected()?.title }}"?
+      </div>
+      <div class="card-footer text-end">
+        <button class="btn btn-secondary me-2" (click)="closeModals()">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deletingTask()">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="deletingTask()"></span>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+
