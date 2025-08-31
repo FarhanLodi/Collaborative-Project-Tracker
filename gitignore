@@ -1,0 +1,113 @@
+# .NET Core API .gitignore
+
+# Build results
+[Bb]in/
+[Oo]bj/
+obj/
+Obj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+*.log
+*.tlog
+
+# Visual Studio cache/options
+.vs/
+*.user
+*.suo
+*.userosscache
+*.userprefs
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally everything is restored by NuGet
+#!**/[Pp]ackages/repositories.config
+
+# Microsoft Azure build output/temp
+csx/
+*.build.csdef
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# DotCover
+*.dotCover
+
+# JetBrains Rider
+.idea/
+
+# Others
+*.dbmdl
+*.bak
+*.ldf
+*.mdf
+*.ndf
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+
+# dotenv environment variables file
+.env
+
+# node_modules (if using with frontend in same repo)
+node_modules/
+
+# Dist (frontend build output if hosted in backend)
+dist/
+
+# Publish output
+/publish/
+/out/
+
+# Coverage
+coverage*
+*.coverage
+*.coveragexml
+
+# Backup & reports
+*.bak
+*.bkp
+*.swp
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+
+# Test results
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+*.trx
+*.xml
+*.coverage
+*.codecov
+*.opencover.xml
